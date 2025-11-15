@@ -41,7 +41,7 @@ setup: ## Install pre-commit hooks and prepare environment
 
 .PHONY: install-tools
 install-tools: ## Install local linters (markdownlint, prettier, actionlint) if Node present
-	@if [ "$(HAS_NPM)" = "1" ]; then npm i -g markdownlint-cli2 markdownlint-cli2-config-standard prettier; else echo "npm not available"; fi
+	@if [ "$(HAS_NPM)" = "1" ]; then npm i -g markdownlint-cli2 prettier; else echo "npm not available"; fi
 	@./scripts/install-actionlint.sh || true 2>/dev/null || true
 	@echo "$(GREEN)install-tools complete$(NC)"
 
