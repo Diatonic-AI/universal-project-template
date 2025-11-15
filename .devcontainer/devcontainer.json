@@ -1,0 +1,21 @@
+{
+  "name": "universal-project-template",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": { "version": "20" },
+    "ghcr.io/devcontainers/features/python:1": { "version": "3.12" }
+  },
+  "postCreateCommand": "pip3 install pre-commit && pre-commit install || true",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.makefile-tools",
+        "esbenp.prettier-vscode",
+        "DavidAnson.vscode-markdownlint",
+        "ms-python.python",
+        "GitHub.vscode-pull-request-github",
+        "ms-azuretools.vscode-docker"
+      ]
+    }
+  }
+}

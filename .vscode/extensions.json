@@ -1,0 +1,10 @@
+{
+  "recommendations": [
+    "ms-vscode.makefile-tools",
+    "esbenp.prettier-vscode",
+    "DavidAnson.vscode-markdownlint",
+    "ms-python.python",
+    "GitHub.vscode-pull-request-github",
+    "ms-azuretools.vscode-docker"
+  ]
+}

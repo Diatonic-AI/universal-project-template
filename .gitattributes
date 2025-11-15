@@ -1,0 +1,9 @@
+# Normalize line endings and improve diffs
+* text=auto eol=lf
+*.md diff=markdown
+*.sh linguist-language=Shell
+*.ps1 linguist-language=PowerShell
+docs/** linguist-documentation
+.gitattributes export-ignore
+.gitignore export-ignore
+.github/** linguist-documentation

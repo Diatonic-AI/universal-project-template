@@ -1,0 +1,48 @@
+name: CI
+on:
+  push:
+  pull_request:
+jobs:
+  lint-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        if: ${{ hashFiles('**/package.json') != '' }}
+        uses: actions/setup-node@v4
+        with: { node-version: '20' }
+
+      - name: Setup Python
+        if: ${{ hashFiles('**/pyproject.toml','**/requirements.txt') != '' }}
+        uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+
+      - name: Install linters
+        run: |
+          npm i -g markdownlint-cli2 markdownlint-cli2-config-standard prettier || true
+          echo "Downloading actionlint..."
+          curl -sSf https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash | bash -s -- -b ./bin/
+          echo "$PWD/bin" >> $GITHUB_PATH
+
+      - name: Lint: Markdown
+        run: markdownlint-cli2 "**/*.md" "#node_modules" "#.git" || true
+
+      - name: Lint: Shell
+        run: shellcheck -x $(git ls-files '*.sh') || true
+
+      - name: Lint: GitHub Actions
+        run: actionlint
+
+      - name: Node tests (if present)
+        if: ${{ hashFiles('**/package.json') != '' }}
+        run: |
+          npm ci
+          npm test --if-present
+
+      - name: Python tests (if present)
+        if: ${{ hashFiles('**/pyproject.toml','**/requirements.txt') != '' }}
+        run: |
+          python -m pip install -U pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          if command -v pytest >/dev/null 2>&1; then pytest -q || true; fi

@@ -1,0 +1,39 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors/IDE
+# .vscode/ - included in template for recommended settings
+.idea/
+*.swp
+*.swo
+
+# Node/TypeScript
+node_modules/
+npm-debug.log*
+yarn-error.log*
+pnpm-lock.yaml
+dist/
+build/
+coverage/
+.npm/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.env
+.env.*
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Misc
+.cache/
+tmp/
+.out/
+logs/
+.bin/
