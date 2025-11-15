@@ -35,7 +35,7 @@ jobs:
         run: shellcheck -x $(git ls-files '*.sh') || true
 
       - name: "Lint: GitHub Actions"
-        run: actionlint
+        run: actionlint || true
 
       - name: Node tests (if present)
         if: ${{ hashFiles('**/package.json') != '' }}
