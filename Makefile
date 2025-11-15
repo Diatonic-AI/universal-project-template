@@ -1,7 +1,7 @@
 # Make-based automation (cross-platform; POSIX-friendly)
 # Use 'make help' to list targets.
 
-SHELL := /bin/sh
+SHELL := /bin/bash
 .ONESHELL:
 .SHELLFLAGS := -eu -o pipefail -c
 
