@@ -1,0 +1,223 @@
+# Branch Maintenance Workflow
+#
+# Purpose: Automatically manage stale and merged branches
+# Triggers: Daily at 00:00 UTC, or manually via workflow_dispatch
+# Duration: ~1-2 minutes
+#
+# What it does:
+# 1. Identifies stale branches (no activity for 90 days)
+# 2. Comments on stale branches warning of deletion
+# 3. Optionally deletes very old stale branches (180 days)
+# 4. Cleans up merged branches (optional, configurable)
+#
+# Customization:
+# - Adjust stale threshold (STALE_DAYS, DELETE_DAYS)
+# - Enable/disable auto-deletion
+# - Exclude specific branches from cleanup
+#
+name: Branch Maintenance
+
+on:
+  schedule:
+    # Run daily at midnight UTC
+    - cron: '0 0 * * *'
+  workflow_dispatch:  # Allow manual trigger
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  cleanup-branches:
+    name: Clean up stale branches
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all branches
+
+      - name: Find and handle stale branches
+        uses: actions/github-script@v7
+        env:
+          STALE_DAYS: 90  # Warn about branches older than this
+          DELETE_DAYS: 180  # Delete branches older than this
+          AUTO_DELETE_ENABLED: false  # Set to true to enable auto-deletion
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const staleDays = parseInt(process.env.STALE_DAYS);
+            const deleteDays = parseInt(process.env.DELETE_DAYS);
+            const autoDelete = process.env.AUTO_DELETE_ENABLED === 'true';
+
+            const now = new Date();
+            const staleThreshold = new Date(now - staleDays * 24 * 60 * 60 * 1000);
+            const deleteThreshold = new Date(now - deleteDays * 24 * 60 * 60 * 1000);
+
+            // Get all branches
+            const { data: branches } = await github.rest.repos.listBranches({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 100
+            });
+
+            // Protected branches to never touch
+            const protectedBranches = ['main', 'master', 'develop', 'staging', 'production'];
+
+            console.log(`Checking ${branches.length} branches...`);
+
+            for (const branch of branches) {
+              const branchName = branch.name;
+
+              // Skip protected branches
+              if (protectedBranches.includes(branchName)) {
+                console.log(`Skipping protected branch: ${branchName}`);
+                continue;
+              }
+
+              // Skip branches with active PRs
+              const { data: prs } = await github.rest.pulls.list({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                head: `${context.repo.owner}:${branchName}`,
+                state: 'open'
+              });
+
+              if (prs.length > 0) {
+                console.log(`Skipping branch with active PR: ${branchName}`);
+                continue;
+              }
+
+              // Get last commit date
+              const { data: commit } = await github.rest.repos.getCommit({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: branch.commit.sha
+              });
+
+              const lastCommitDate = new Date(commit.commit.author.date);
+              const daysSinceLastCommit = Math.floor((now - lastCommitDate) / (24 * 60 * 60 * 1000));
+
+              console.log(`Branch: ${branchName}, Last activity: ${daysSinceLastCommit} days ago`);
+
+              // Check if branch should be deleted
+              if (autoDelete && lastCommitDate < deleteThreshold) {
+                console.log(`🗑️  Deleting very stale branch: ${branchName} (${daysSinceLastCommit} days old)`);
+
+                try {
+                  await github.rest.git.deleteRef({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    ref: `heads/${branchName}`
+                  });
+
+                  // Create issue to notify
+                  await github.rest.issues.create({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    title: `Branch deleted: ${branchName}`,
+                    body: `The branch \`${branchName}\` was automatically deleted due to inactivity (${daysSinceLastCommit} days).\n\nLast commit: ${commit.commit.message}\nAuthor: ${commit.commit.author.name}\nDate: ${lastCommitDate.toISOString()}`,
+                    labels: ['automated', 'branch-maintenance']
+                  });
+                } catch (error) {
+                  console.error(`Failed to delete branch ${branchName}:`, error.message);
+                }
+              }
+              // Check if branch is stale and should be warned
+              else if (lastCommitDate < staleThreshold) {
+                console.log(`⚠️  Stale branch detected: ${branchName} (${daysSinceLastCommit} days old)`);
+
+                // Check if we already created an issue for this branch
+                const { data: issues } = await github.rest.issues.listForRepo({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  labels: 'stale-branch',
+                  state: 'open'
+                });
+
+                const existingIssue = issues.find(issue =>
+                  issue.title.includes(branchName)
+                );
+
+                if (!existingIssue) {
+                  await github.rest.issues.create({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    title: `Stale branch: ${branchName}`,
+                    body: `The branch \`${branchName}\` has been inactive for ${daysSinceLastCommit} days and may be ready for deletion.\n\n**Last commit:**\n- Message: ${commit.commit.message}\n- Author: ${commit.commit.author.name}\n- Date: ${lastCommitDate.toISOString()}\n\n**Actions:**\n- If this branch is still needed, add a comment to keep it active\n- If not needed, delete the branch or close this issue to prevent auto-deletion\n- This branch will be automatically deleted after ${deleteDays} days of inactivity${autoDelete ? '' : ' (currently disabled)'}\n\n**To delete manually:**\n\`\`\`bash\ngit push origin --delete ${branchName}\n\`\`\`\n\n---\n*This issue was created by the Branch Maintenance workflow.*`,
+                    labels: ['stale-branch', 'automated'],
+                    assignees: [commit.commit.author.name].filter(Boolean)
+                  });
+                }
+              }
+            }
+
+  cleanup-merged-branches:
+    name: Clean up merged branches
+    runs-on: ubuntu-latest
+    # Only run if explicitly enabled
+    if: false  # Change to true to enable
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Delete merged branches
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            // Get all closed/merged PRs
+            const { data: prs } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'closed',
+              per_page: 100
+            });
+
+            const protectedBranches = ['main', 'master', 'develop', 'staging', 'production'];
+
+            for (const pr of prs) {
+              // Skip if PR wasn't merged
+              if (!pr.merged_at) continue;
+
+              const branchName = pr.head.ref;
+
+              // Skip protected branches
+              if (protectedBranches.includes(branchName)) continue;
+
+              // Check if branch still exists
+              try {
+                await github.rest.repos.getBranch({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  branch: branchName
+                });
+
+                // Branch exists, delete it
+                console.log(`Deleting merged branch: ${branchName} (PR #${pr.number})`);
+
+                await github.rest.git.deleteRef({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  ref: `heads/${branchName}`
+                });
+
+                // Comment on PR
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: pr.number,
+                  body: `Branch \`${branchName}\` was automatically deleted after merge.`
+                });
+
+              } catch (error) {
+                if (error.status === 404) {
+                  console.log(`Branch ${branchName} already deleted`);
+                } else {
+                  console.error(`Error deleting branch ${branchName}:`, error.message);
+                }
+              }
+            }

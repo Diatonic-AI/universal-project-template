@@ -1,0 +1,73 @@
+# Labeler Configuration
+#
+# This file defines automatic labeling rules for pull requests
+# based on which files are changed.
+#
+# Syntax:
+#   label-name:
+#     - changed-files:
+#       - any-glob-to-any-file: 'path/to/files/**'
+#
+# See: https://github.com/actions/labeler
+
+documentation:
+  - changed-files:
+    - any-glob-to-any-file: 'docs/**'
+    - any-glob-to-any-file: '**/*.md'
+    - any-glob-to-any-file: 'README.md'
+
+dependencies:
+  - changed-files:
+    - any-glob-to-any-file: 'package.json'
+    - any-glob-to-any-file: 'package-lock.json'
+    - any-glob-to-any-file: 'yarn.lock'
+    - any-glob-to-any-file: 'pnpm-lock.yaml'
+    - any-glob-to-any-file: 'requirements.txt'
+    - any-glob-to-any-file: 'pyproject.toml'
+    - any-glob-to-any-file: 'poetry.lock'
+    - any-glob-to-any-file: 'Cargo.toml'
+    - any-glob-to-any-file: 'Cargo.lock'
+    - any-glob-to-any-file: 'go.mod'
+    - any-glob-to-any-file: 'go.sum'
+
+ci:
+  - changed-files:
+    - any-glob-to-any-file: '.github/workflows/**'
+    - any-glob-to-any-file: '.github/actions/**'
+    - any-glob-to-any-file: 'Makefile'
+
+tests:
+  - changed-files:
+    - any-glob-to-any-file: '**/*.test.*'
+    - any-glob-to-any-file: '**/*.spec.*'
+    - any-glob-to-any-file: 'tests/**'
+    - any-glob-to-any-file: 'test/**'
+    - any-glob-to-any-file: '__tests__/**'
+
+security:
+  - changed-files:
+    - any-glob-to-any-file: '.github/workflows/codeql.yml'
+    - any-glob-to-any-file: '.github/dependabot.yml'
+    - any-glob-to-any-file: 'SECURITY.md'
+
+configuration:
+  - changed-files:
+    - any-glob-to-any-file: '**/*.config.js'
+    - any-glob-to-any-file: '**/*.config.ts'
+    - any-glob-to-any-file: '.eslintrc*'
+    - any-glob-to-any-file: '.prettierrc*'
+    - any-glob-to-any-file: 'tsconfig.json'
+    - any-glob-to-any-file: 'pyproject.toml'
+    - any-glob-to-any-file: '.editorconfig'
+
+docker:
+  - changed-files:
+    - any-glob-to-any-file: 'Dockerfile*'
+    - any-glob-to-any-file: 'docker-compose*.yml'
+    - any-glob-to-any-file: '.dockerignore'
+
+scripts:
+  - changed-files:
+    - any-glob-to-any-file: 'scripts/**'
+    - any-glob-to-any-file: '**/*.sh'
+    - any-glob-to-any-file: '**/*.ps1'
