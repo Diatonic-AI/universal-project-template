@@ -1,0 +1,240 @@
+# PR Quality Gate Workflow
+#
+# Purpose: Enforce quality standards and automate PR management
+# Triggers: When PRs are opened, updated, or labeled
+# Duration: ~30 seconds
+#
+# What it does:
+# 1. Auto-labels PRs based on changed files
+# 2. Validates PR title follows Conventional Commits
+# 3. Checks PR description completeness
+# 4. Posts helpful comments with review checklist
+# 5. Validates branch naming conventions
+#
+# Customization:
+# - Adjust label patterns in the labeler section
+# - Modify required PR description sections
+# - Add custom quality checks
+#
+name: PR Quality Gate
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  auto-label:
+    name: Auto-label PR
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Label based on changed files
+        uses: actions/labeler@v5
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          configuration-path: .github/labeler.yml
+
+  validate-pr:
+    name: Validate PR
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate PR title (Conventional Commits)
+        uses: amannn/action-semantic-pull-request@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          types: |
+            feat
+            fix
+            docs
+            style
+            refactor
+            perf
+            test
+            build
+            ci
+            chore
+            revert
+          requireScope: false  # Scope is optional
+          subjectPattern: ^[a-z].+$  # Must start with lowercase
+          subjectPatternError: |
+            The subject "{subject}" found in the pull request title "{title}"
+            didn't match the configured pattern. Please ensure that the subject
+            starts with a lowercase letter.
+
+      - name: Check PR description
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const pr = context.payload.pull_request;
+            const body = pr.body || '';
+
+            // Check if PR has description
+            if (body.trim().length < 50) {
+              core.setFailed('PR description is too short. Please provide a detailed description.');
+              return;
+            }
+
+            // Check for required sections
+            const requiredSections = ['Summary', 'Related Issues', 'Type of Change'];
+            const missingSections = requiredSections.filter(section =>
+              !body.includes(`## ${section}`) && !body.includes(`### ${section}`)
+            );
+
+            if (missingSections.length > 0) {
+              core.warning(`PR description is missing sections: ${missingSections.join(', ')}`);
+            }
+
+            // Check for linked issues
+            const hasIssueLink = /(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s+#\d+/i.test(body);
+            if (!hasIssueLink) {
+              core.warning('PR does not link to any issues. Consider adding "Fixes #123"');
+            }
+
+  post-review-checklist:
+    name: Post review checklist
+    runs-on: ubuntu-latest
+    if: github.event.action == 'opened'
+    steps:
+      - name: Post review checklist comment
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const comment = `## Review Checklist
+
+            Thank you for your contribution! 🎉
+
+            ### For the PR Author
+
+            Before requesting review, please ensure:
+            - [ ] PR title follows [Conventional Commits](https://www.conventionalcommits.org/)
+            - [ ] All CI checks pass
+            - [ ] Tests added for new functionality
+            - [ ] Documentation updated (if needed)
+            - [ ] Self-review completed
+            - [ ] AI review completed (see [AI-AGENT-WORKFLOWS.md](docs/AI-AGENT-WORKFLOWS.md))
+
+            ### For Reviewers
+
+            Please check:
+            - [ ] Code follows project style guidelines
+            - [ ] No security vulnerabilities introduced
+            - [ ] Test coverage is adequate
+            - [ ] Documentation is clear and complete
+            - [ ] Breaking changes are clearly documented
+
+            ### AI-Assisted Review
+
+            Consider using Claude Code for comprehensive review:
+            \`\`\`
+            @claude Review this PR for:
+            - Security vulnerabilities
+            - Performance issues
+            - Test coverage gaps
+            - Code quality and maintainability
+            \`\`\`
+
+            See [AI-AGENT-WORKFLOWS.md](docs/AI-AGENT-WORKFLOWS.md) for detailed AI review patterns.
+
+            ---
+            *This checklist was automatically posted by the PR Quality Gate workflow.*
+            `;
+
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: comment
+            });
+
+  check-branch-name:
+    name: Validate branch name
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check branch naming convention
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const branch = context.payload.pull_request.head.ref;
+            const validPrefixes = ['feature/', 'bugfix/', 'hotfix/', 'release/', 'docs/', 'chore/'];
+
+            const isValid = validPrefixes.some(prefix => branch.startsWith(prefix));
+
+            if (!isValid) {
+              core.warning(
+                `Branch name "${branch}" doesn't follow naming convention.\n` +
+                `Expected format: ${validPrefixes.join(', ')}<description>\n` +
+                `Example: feature/add-user-auth\n` +
+                `See docs/GIT-WORKFLOW.md for details.`
+              );
+            } else {
+              console.log(`✓ Branch name "${branch}" follows naming convention`);
+            }
+
+  check-pr-size:
+    name: Check PR size
+    runs-on: ubuntu-latest
+    steps:
+      - name: Warn if PR is too large
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const pr = context.payload.pull_request;
+            const additions = pr.additions;
+            const deletions = pr.deletions;
+            const totalChanges = additions + deletions;
+
+            console.log(`PR changes: +${additions} -${deletions} (total: ${totalChanges})`);
+
+            if (totalChanges > 500) {
+              const comment = `## ⚠️ Large PR Detected
+
+              This PR has ${totalChanges} lines changed (+${additions} -${deletions}).
+
+              **Recommendations**:
+              - Consider breaking this into smaller PRs for easier review
+              - Large PRs take longer to review and merge
+              - Smaller PRs reduce merge conflicts
+
+              If this PR must be large (e.g., generated files, migrations), please:
+              1. Add a comment explaining why
+              2. Highlight the important files for review
+              3. Consider using \`@claude\` for automated review
+
+              See [GIT-WORKFLOW.md](docs/GIT-WORKFLOW.md) for best practices.
+              `;
+
+              // Check if we already posted this warning
+              const { data: comments } = await github.rest.issues.listComments({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number
+              });
+
+              const alreadyWarned = comments.some(comment =>
+                comment.body.includes('Large PR Detected')
+              );
+
+              if (!alreadyWarned) {
+                github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.issue.number,
+                  body: comment
+                });
+              }
+            }

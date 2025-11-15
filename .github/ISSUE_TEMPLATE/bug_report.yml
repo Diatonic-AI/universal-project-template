@@ -1,11 +1,129 @@
-name: Bug report
-description: Report a bug
-labels: [bug]
+name: 🐛 Bug Report
+description: Report a bug or unexpected behavior
+title: "[Bug]: "
+labels: ["bug", "needs-triage"]
 body:
-  - type: textarea
-    id: bug
+  - type: markdown
     attributes:
-      label: Describe the bug
-      placeholder: What happened?
+      value: |
+        Thanks for taking the time to report a bug! Please fill out the information below to help us understand and fix the issue.
+
+        **💡 Tip**: Before creating an issue, try using Claude Code for initial analysis:
+        ```
+        @claude Analyze this error: [error message]
+        Context: [what you were doing]
+        ```
+        See [AI-AGENT-WORKFLOWS.md](../../docs/AI-AGENT-WORKFLOWS.md) for more patterns.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is
+      placeholder: When I do X, Y happens instead of Z
     validations:
       required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: Steps to reproduce the behavior
+      placeholder: |
+        1. Go to '...'
+        2. Click on '...'
+        3. Scroll down to '...'
+        4. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What you expected to happen
+      placeholder: The application should...
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happened
+      placeholder: Instead, the application...
+    validations:
+      required: true
+
+  - type: textarea
+    id: error
+    attributes:
+      label: Error Messages / Logs
+      description: If applicable, paste any error messages or relevant logs
+      placeholder: |
+        Error: Cannot read property 'id' of undefined
+          at UserService.getUser (src/services/user.service.ts:45)
+      render: shell
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Information about your environment
+      value: |
+        - OS: [e.g., macOS 14.1, Ubuntu 22.04, Windows 11]
+        - Browser (if applicable): [e.g., Chrome 120, Firefox 121]
+        - Node.js version: [e.g., 20.10.0]
+        - Package version: [e.g., 1.2.3]
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      description: How severe is this bug?
+      options:
+        - Critical (blocks development or causes data loss)
+        - High (major functionality broken)
+        - Medium (workaround exists)
+        - Low (minor issue or cosmetic)
+    validations:
+      required: true
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: If applicable, add screenshots to help explain the problem
+      placeholder: Drag and drop screenshots here
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Any other context about the problem
+      placeholder: This started happening after upgrading to version X...
+
+  - type: textarea
+    id: ai-analysis
+    attributes:
+      label: AI Analysis (Optional but Recommended)
+      description: If you used Claude Code to analyze the issue, paste the results here
+      placeholder: |
+        @claude analysis results:
+        - Root cause: ...
+        - Suggested fix: ...
+      render: markdown
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I have searched existing issues to ensure this is not a duplicate
+          required: true
+        - label: I have provided all requested information
+          required: true
+        - label: I can reproduce this issue consistently
+          required: false
