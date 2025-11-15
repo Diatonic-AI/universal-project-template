@@ -27,13 +27,13 @@ jobs:
           curl -sSf https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash | bash -s -- -b ./bin/
           echo "$PWD/bin" >> $GITHUB_PATH
 
-      - name: Lint: Markdown
+      - name: "Lint: Markdown"
         run: markdownlint-cli2 "**/*.md" "#node_modules" "#.git" || true
 
-      - name: Lint: Shell
+      - name: "Lint: Shell"
         run: shellcheck -x $(git ls-files '*.sh') || true
 
-      - name: Lint: GitHub Actions
+      - name: "Lint: GitHub Actions"
         run: actionlint
 
       - name: Node tests (if present)
