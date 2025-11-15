@@ -24,7 +24,8 @@ jobs:
         run: |
           npm i -g markdownlint-cli2 prettier || true
           echo "Downloading actionlint..."
-          curl -sSf https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash | bash -s -- latest ./bin/
+          mkdir -p ./bin
+          curl -sSf https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash | bash -s -- latest ./bin
           echo "$PWD/bin" >> $GITHUB_PATH
 
       - name: "Lint: Markdown"
