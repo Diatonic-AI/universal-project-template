@@ -1,0 +1,218 @@
+{
+  "repo": "Diatonic-AI/universal-project-template",
+  "failedRunsCount": 50,
+  "topFailedRuns": [
+    {
+      "name": "CodeQL",
+      "url": "https://github.com/Diatonic-AI/universal-project-template/actions/runs/19402567446",
+      "createdAt": "2025-11-16T08:01:46Z",
+      "databaseId": 19402567446
+    },
+    {
+      "name": "release-please",
+      "url": "https://github.com/Diatonic-AI/universal-project-template/actions/runs/19402567432",
+      "createdAt": "2025-11-16T08:01:46Z",
+      "databaseId": 19402567432
+    },
+    {
+      "name": "CodeQL",
+      "url": "https://github.com/Diatonic-AI/universal-project-template/actions/runs/19402566365",
+      "createdAt": "2025-11-16T08:01:40Z",
+      "databaseId": 19402566365
+    },
+    {
+      "name": "release-please",
+      "url": "https://github.com/Diatonic-AI/universal-project-template/actions/runs/19394932581",
+      "createdAt": "2025-11-15T20:08:59Z",
+      "databaseId": 19394932581
+    },
+    {
+      "name": "CodeQL",
+      "url": "https://github.com/Diatonic-AI/universal-project-template/actions/runs/19394932577",
+      "createdAt": "2025-11-15T20:08:59Z",
+      "databaseId": 19394932577
+    },
+    {
+      "name": "CodeQL",
+      "url": "https://github.com/Diatonic-AI/universal-project-template/actions/runs/19394932377",
+      "createdAt": "2025-11-15T20:08:58Z",
+      "databaseId": 19394932377
+    },
+    {
+      "name": "CodeQL",
+      "url": "https://github.com/Diatonic-AI/universal-project-template/actions/runs/19394859496",
+      "createdAt": "2025-11-15T20:02:59Z",
+      "databaseId": 19394859496
+    },
+    {
+      "name": "release-please",
+      "url": "https://github.com/Diatonic-AI/universal-project-template/actions/runs/19394859481",
+      "createdAt": "2025-11-15T20:02:59Z",
+      "databaseId": 19394859481
+    },
+    {
+      "name": "CodeQL",
+      "url": "https://github.com/Diatonic-AI/universal-project-template/actions/runs/19394859341",
+      "createdAt": "2025-11-15T20:02:59Z",
+      "databaseId": 19394859341
+    },
+    {
+      "name": "CodeQL",
+      "url": "https://github.com/Diatonic-AI/universal-project-template/actions/runs/19394576050",
+      "createdAt": "2025-11-15T19:33:49Z",
+      "databaseId": 19394576050
+    },
+    {
+      "name": "release-please",
+      "url": "https://github.com/Diatonic-AI/universal-project-template/actions/runs/19394575950",
+      "createdAt": "2025-11-15T19:33:49Z",
+      "databaseId": 19394575950
+    },
+    {
+      "name": "CodeQL",
+      "url": "https://github.com/Diatonic-AI/universal-project-template/actions/runs/19394575944",
+      "createdAt": "2025-11-15T19:33:49Z",
+      "databaseId": 19394575944
+    },
+    {
+      "name": "CodeQL",
+      "url": "https://github.com/Diatonic-AI/universal-project-template/actions/runs/19394316855",
+      "createdAt": "2025-11-15T19:10:33Z",
+      "databaseId": 19394316855
+    },
+    {
+      "name": "release-please",
+      "url": "https://github.com/Diatonic-AI/universal-project-template/actions/runs/19394316762",
+      "createdAt": "2025-11-15T19:10:33Z",
+      "databaseId": 19394316762
+    },
+    {
+      "name": "CodeQL",
+      "url": "https://github.com/Diatonic-AI/universal-project-template/actions/runs/19394316760",
+      "createdAt": "2025-11-15T19:10:33Z",
+      "databaseId": 19394316760
+    },
+    {
+      "name": "CodeQL",
+      "url": "https://github.com/Diatonic-AI/universal-project-template/actions/runs/19394074360",
+      "createdAt": "2025-11-15T18:48:43Z",
+      "databaseId": 19394074360
+    },
+    {
+      "name": "release-please",
+      "url": "https://github.com/Diatonic-AI/universal-project-template/actions/runs/19394074203",
+      "createdAt": "2025-11-15T18:48:42Z",
+      "databaseId": 19394074203
+    },
+    {
+      "name": "CodeQL",
+      "url": "https://github.com/Diatonic-AI/universal-project-template/actions/runs/19394074202",
+      "createdAt": "2025-11-15T18:48:42Z",
+      "databaseId": 19394074202
+    },
+    {
+      "name": "CodeQL",
+      "url": "https://github.com/Diatonic-AI/universal-project-template/actions/runs/19394051579",
+      "createdAt": "2025-11-15T18:46:43Z",
+      "databaseId": 19394051579
+    },
+    {
+      "name": "CI",
+      "url": "https://github.com/Diatonic-AI/universal-project-template/actions/runs/19394051575",
+      "createdAt": "2025-11-15T18:46:43Z",
+      "databaseId": 19394051575
+    }
+  ],
+  "longestJobs": [
+    {
+      "runUrl": "https://github.com/Diatonic-AI/universal-project-template/actions/runs/19394575944",
+      "jobName": "Analyze (javascript-typescript)",
+      "durationMinutes": 0.7,
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "conclusion": "failure"
+    },
+    {
+      "runUrl": "https://github.com/Diatonic-AI/universal-project-template/actions/runs/19394316855",
+      "jobName": "Analyze (javascript-typescript)",
+      "durationMinutes": 0.7,
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "conclusion": "failure"
+    },
+    {
+      "runUrl": "https://github.com/Diatonic-AI/universal-project-template/actions/runs/19394859341",
+      "jobName": "Analyze (javascript-typescript)",
+      "durationMinutes": 0.68,
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "conclusion": "failure"
+    },
+    {
+      "runUrl": "https://github.com/Diatonic-AI/universal-project-template/actions/runs/19394859341",
+      "jobName": "Analyze (python)",
+      "durationMinutes": 0.68,
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "conclusion": "failure"
+    },
+    {
+      "runUrl": "https://github.com/Diatonic-AI/universal-project-template/actions/runs/19394051579",
+      "jobName": "Analyze (javascript-typescript)",
+      "durationMinutes": 0.68,
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "conclusion": "failure"
+    },
+    {
+      "runUrl": "https://github.com/Diatonic-AI/universal-project-template/actions/runs/19402567446",
+      "jobName": "Analyze (python)",
+      "durationMinutes": 0.65,
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "conclusion": "failure"
+    },
+    {
+      "runUrl": "https://github.com/Diatonic-AI/universal-project-template/actions/runs/19394576050",
+      "jobName": "Analyze (javascript-typescript)",
+      "durationMinutes": 0.65,
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "conclusion": "failure"
+    },
+    {
+      "runUrl": "https://github.com/Diatonic-AI/universal-project-template/actions/runs/19394316855",
+      "jobName": "Analyze (python)",
+      "durationMinutes": 0.65,
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "conclusion": "failure"
+    },
+    {
+      "runUrl": "https://github.com/Diatonic-AI/universal-project-template/actions/runs/19394316760",
+      "jobName": "Analyze (javascript-typescript)",
+      "durationMinutes": 0.65,
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "conclusion": "failure"
+    },
+    {
+      "runUrl": "https://github.com/Diatonic-AI/universal-project-template/actions/runs/19402566365",
+      "jobName": "Analyze (javascript-typescript)",
+      "durationMinutes": 0.63,
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "conclusion": "failure"
+    }
+  ]
+}
