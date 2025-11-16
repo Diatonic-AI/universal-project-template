@@ -9,18 +9,53 @@
 ## Table of Contents
 
 - [Prerequisites](#prerequisites)
+- [Quick Start: Automated Setup](#quick-start-automated-setup)
 - [Recommended Approach: WSL2](#recommended-approach-wsl2)
 - [Alternative: Native Windows](#alternative-native-windows)
 - [Common Tools](#common-tools)
+- [Additional Development Tools](#additional-development-tools)
 - [Verification](#verification)
 - [IDE Setup](#ide-setup)
 - [Troubleshooting](#troubleshooting)
+- [Advanced Configuration](#advanced-configuration)
+
+## Before You Start
+
+**New to development?** Start with the [GETTING-STARTED-BEGINNER.md](GETTING-STARTED-BEGINNER.md) guide for a complete walkthrough.
+
+**Need to enable virtualization?** See [BIOS-VIRTUALIZATION-GUIDE.md](BIOS-VIRTUALIZATION-GUIDE.md) for detailed BIOS configuration.
+
+**Want to optimize Windows?** Check [WINDOWS-OPTIMIZATION.md](WINDOWS-OPTIMIZATION.md) for performance tuning.
+
+**WSL2 advanced users?** See [WSL2-ADVANCED-SETUP.md](WSL2-ADVANCED-SETUP.md) for optimization and advanced configuration.
 
 ## Prerequisites
 
 - Windows 10 version 2004+ (Build 19041+) or Windows 11
 - Administrator access for initial setup
 - Stable internet connection
+- **Virtualization enabled in BIOS** (see [BIOS-VIRTUALIZATION-GUIDE.md](BIOS-VIRTUALIZATION-GUIDE.md))
+
+## Quick Start: Automated Setup
+
+For automated installation, run our PowerShell setup script:
+
+```powershell
+# Download and run setup script
+# From PowerShell as Administrator
+.\scripts\setup-dev-env-windows.ps1
+```
+
+This script will:
+- Install Chocolatey package manager
+- Install Git, Make, Node.js, Python
+- Configure Git
+- Generate SSH keys (optional)
+- Install recommended tools
+
+**Or continue below for manual, step-by-step installation.**
+
+---
 
 ## Recommended Approach: WSL2
 
@@ -132,7 +167,42 @@ echo "alias pip=pip3" >> ~/.bashrc
 source ~/.bashrc
 ```
 
-#### Docker (Optional, without Docker Desktop)
+#### Rust (Optional)
+
+```bash
+# Install Rust via rustup
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+# Follow prompts (default installation is recommended)
+# Reload shell
+source ~/.cargo/env
+
+# Verify installation
+rustc --version
+cargo --version
+```
+
+#### Docker Desktop (Recommended for WSL2)
+
+**Option A: Docker Desktop (Easiest)**
+1. Download Docker Desktop from https://www.docker.com/products/docker-desktop/
+2. Run installer
+3. During installation, select "Use WSL 2 instead of Hyper-V"
+4. Restart computer
+5. Open Docker Desktop
+6. Settings → General → "Use the WSL 2 based engine" (should be checked)
+7. Settings → Resources → WSL Integration:
+   - Enable integration with your WSL2 distro (Ubuntu)
+
+**Verify**:
+```bash
+# From WSL2
+docker --version
+docker compose version
+docker run hello-world
+```
+
+**Option B: Docker Engine only (without Docker Desktop)**
 
 ```bash
 # Add Docker's official GPG key
@@ -143,7 +213,7 @@ echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docke
 
 # Install Docker
 sudo apt update
-sudo apt install -y docker-ce docker-ce-cli containerd.io
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
 
 # Add your user to docker group
 sudo usermod -aG docker $USER
@@ -154,6 +224,23 @@ sudo service docker start
 # Verify
 docker --version
 ```
+
+#### Windows Terminal (Highly Recommended)
+
+Install Windows Terminal for a better terminal experience:
+
+```powershell
+# From PowerShell (Windows)
+winget install Microsoft.WindowsTerminal
+
+# Or install from Microsoft Store
+```
+
+**Configure Windows Terminal**:
+1. Open Windows Terminal
+2. Press Ctrl+, to open settings
+3. Set "Default profile" to "Ubuntu" (for WSL2 users)
+4. Customize appearance, color schemes, etc.
 
 ### Step 6: Configure Git in WSL2
 
@@ -395,6 +482,86 @@ pip install pre-commit
 
 ---
 
+## Additional Development Tools
+
+### Rust (Native Windows)
+
+```powershell
+# Download and run rustup-init.exe from https://rustup.rs/
+
+# Or via Chocolatey
+choco install rust-ms
+
+# Verify
+rustc --version
+cargo --version
+```
+
+### Docker Desktop (Native Windows)
+
+1. Download from https://www.docker.com/products/docker-desktop/
+2. Run installer
+3. Choose WSL 2 backend if available, or Hyper-V (Pro/Enterprise/Education only)
+4. Restart computer
+
+**Verify**:
+```powershell
+docker --version
+docker compose version
+docker run hello-world
+```
+
+### Windows Terminal
+
+```powershell
+# Install via winget
+winget install Microsoft.WindowsTerminal
+
+# Or from Microsoft Store
+```
+
+**Benefits**:
+- Tabs and split panes
+- GPU-accelerated text rendering
+- Customizable color schemes
+- Better Unicode support
+
+### Make (via Chocolatey)
+
+```powershell
+choco install make
+make --version
+```
+
+### curl (Usually pre-installed)
+
+```powershell
+# Verify
+curl --version
+
+# If not installed
+choco install curl
+```
+
+### jq (JSON processor)
+
+```powershell
+choco install jq
+
+# Verify
+jq --version
+```
+
+### Postman (API testing)
+
+```powershell
+choco install postman
+
+# Or download from https://www.postman.com/
+```
+
+---
+
 ## Verification
 
 Run the following commands to verify your setup:
@@ -533,12 +700,52 @@ chmod +x scripts/*.sh
 
 ---
 
+## Advanced Configuration
+
+### Performance Optimization
+
+For detailed Windows performance tuning for development workloads, see:
+**[WINDOWS-OPTIMIZATION.md](WINDOWS-OPTIMIZATION.md)**
+
+Topics covered:
+- Windows Features management
+- Windows Defender exclusions
+- Virtual memory configuration
+- Power management settings
+- Network optimization
+- GPU configuration for AI/ML
+
+### WSL2 Advanced Setup
+
+For advanced WSL2 configuration, memory limits, and performance tuning, see:
+**[WSL2-ADVANCED-SETUP.md](WSL2-ADVANCED-SETUP.md)**
+
+Topics covered:
+- .wslconfig configuration (memory, CPU limits)
+- wsl.conf settings
+- Performance best practices
+- Docker Desktop integration
+- GPU support (NVIDIA/AMD)
+- Networking configuration
+
+### BIOS Configuration
+
+If virtualization features are not working, see:
+**[BIOS-VIRTUALIZATION-GUIDE.md](BIOS-VIRTUALIZATION-GUIDE.md)**
+
+Complete guide for enabling Intel VT-x/VT-d and AMD SVM/IOMMU across all major motherboard manufacturers.
+
+---
+
 ## Additional Resources
 
 - [Official WSL2 Documentation](https://docs.microsoft.com/en-us/windows/wsl/)
 - [Git for Windows](https://gitforwindows.org/)
 - [VS Code Remote Development](https://code.visualstudio.com/docs/remote/wsl)
 - [GitHub SSH Setup](https://docs.github.com/en/authentication/connecting-to-github-with-ssh)
+- [Docker Desktop for Windows](https://docs.docker.com/desktop/install/windows-install/)
+- [Rust on Windows](https://www.rust-lang.org/tools/install)
+- [Windows Terminal Documentation](https://learn.microsoft.com/en-us/windows/terminal/)
 
 ---
 

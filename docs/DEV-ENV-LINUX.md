@@ -6,11 +6,45 @@
 
 **Estimated time**: 10-20 minutes
 
+## Before You Start
+
+**New to development?** Start with the [GETTING-STARTED-BEGINNER.md](GETTING-STARTED-BEGINNER.md) guide for a complete walkthrough.
+
+**Using Windows with WSL2?** See [DEV-ENV-WINDOWS.md](DEV-ENV-WINDOWS.md) for Windows-specific setup.
+
+**Need BIOS configuration?** Check [BIOS-VIRTUALIZATION-GUIDE.md](BIOS-VIRTUALIZATION-GUIDE.md) if running VMs or Docker.
+
 ## Prerequisites
 
 - Linux distribution (Ubuntu 20.04+, Fedora 35+, or equivalent)
 - sudo access
 - Internet connection
+- **(Optional)** Virtualization enabled in BIOS for Docker/VMs (see [BIOS-VIRTUALIZATION-GUIDE.md](BIOS-VIRTUALIZATION-GUIDE.md))
+
+## Quick Start: Automated Setup
+
+For automated installation, run our setup script:
+
+```bash
+# Download repository and run setup script
+git clone <repo-url>
+cd universal-project-template
+
+# Run automated setup
+./scripts/setup-dev-env-linux.sh
+```
+
+This script will:
+- Detect your Linux distribution (Ubuntu/Debian or Fedora/RHEL)
+- Update system packages
+- Install build tools, Git, Node.js (via nvm), Python
+- Configure Git (with prompts)
+- Generate SSH keys (optional)
+- Install GitHub CLI and pre-commit
+
+**Or continue below for manual, step-by-step installation.**
+
+---
 
 ## Quick Setup (Ubuntu/Debian)
 
@@ -121,7 +155,22 @@ echo "alias pip=pip3" >> ~/.bashrc
 source ~/.bashrc
 ```
 
-### Docker (Optional)
+### Rust (Optional)
+
+```bash
+# Install Rust via rustup
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+# Follow prompts (default installation recommended)
+# Reload shell
+source ~/.cargo/env
+
+# Verify
+rustc --version
+cargo --version
+```
+
+### Docker (Recommended for containerized development)
 
 **Ubuntu**:
 ```bash
@@ -130,26 +179,70 @@ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o 
 
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list
 
-# Install
+# Install Docker Engine and Docker Compose
 sudo apt update
-sudo apt install -y docker-ce docker-ce-cli containerd.io
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
 
 # Add user to docker group
 sudo usermod -aG docker $USER
 newgrp docker
 
+# Enable Docker to start on boot
+sudo systemctl enable docker
+
 # Verify
 docker --version
+docker compose version
 ```
 
 **Fedora**:
 ```bash
 sudo dnf -y install dnf-plugins-core
 sudo dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
-sudo dnf install -y docker-ce docker-ce-cli containerd.io
+sudo dnf install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
 sudo systemctl start docker
 sudo systemctl enable docker
 sudo usermod -aG docker $USER
+
+# Verify
+docker --version
+docker compose version
+```
+
+### Additional Development Tools
+
+**Install useful CLI tools:**
+
+```bash
+# Ubuntu/Debian
+sudo apt install -y \
+  jq \                  # JSON processor
+  curl \                # HTTP client
+  wget \                # File downloader
+  tree \                # Directory tree viewer
+  htop \                # System monitor
+  ncdu \                # Disk usage analyzer
+  ripgrep \             # Fast grep alternative
+  fd-find \             # Fast find alternative
+  bat \                 # Cat with syntax highlighting
+  tmux                  # Terminal multiplexer
+
+# Fedora
+sudo dnf install -y \
+  jq \
+  curl \
+  wget \
+  tree \
+  htop \
+  ncdu \
+  ripgrep \
+  fd-find \
+  bat \
+  tmux
+
+# Verify key tools
+jq --version
+curl --version
 ```
 
 ## Step 4: Set Up SSH for GitHub
@@ -367,9 +460,101 @@ sudo dnf install make
 3. Check [docs/CI-CD-PIPELINE.md](CI-CD-PIPELINE.md) for automation details
 4. Start developing!
 
+---
+
+## Advanced Configuration
+
+### BIOS Configuration for Virtualization
+
+If you need to run Docker, VMs, or use hardware virtualization:
+**[BIOS-VIRTUALIZATION-GUIDE.md](BIOS-VIRTUALIZATION-GUIDE.md)**
+
+Complete guide for enabling Intel VT-x/VT-d and AMD SVM/IOMMU across all major motherboard manufacturers.
+
+### Shell Customization
+
+Consider using **Zsh** with **Oh My Zsh** for enhanced shell experience:
+
+```bash
+# Install Zsh
+# Ubuntu/Debian
+sudo apt install -y zsh
+
+# Fedora
+sudo dnf install -y zsh
+
+# Install Oh My Zsh
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
+# Set as default shell
+chsh -s $(which zsh)
+
+# Recommended plugins (edit ~/.zshrc):
+# plugins=(git docker docker-compose npm node python pip rust cargo kubectl)
+```
+
+### Performance Tuning
+
+**For development workstations:**
+- Increase file watchers limit (for Node.js development):
+  ```bash
+  echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf
+  sudo sysctl -p
+  ```
+
+- Enable swap if needed (for systems with <16GB RAM):
+  ```bash
+  # Check current swap
+  free -h
+
+  # Create 4GB swapfile
+  sudo fallocate -l 4G /swapfile
+  sudo chmod 600 /swapfile
+  sudo mkswap /swapfile
+  sudo swapon /swapfile
+
+  # Make permanent
+  echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+  ```
+
+### GPU Support for AI/ML
+
+**NVIDIA CUDA Setup:**
+
+```bash
+# Ubuntu - Install NVIDIA drivers and CUDA
+sudo apt install -y nvidia-driver-530  # Check for latest version
+sudo apt install -y nvidia-cuda-toolkit
+
+# Verify
+nvidia-smi
+nvcc --version
+
+# Install cuDNN (for TensorFlow/PyTorch)
+# Download from NVIDIA Developer portal (requires account)
+# Or use pip packages that include cuDNN:
+pip install tensorflow[and-cuda]
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+```
+
+**AMD ROCm Setup:**
+
+Follow the official AMD ROCm installation guide for your distribution:
+https://rocm.docs.amd.com/en/latest/deploy/linux/quick_start.html
+
+---
+
 ## Additional Resources
 
 - [Ubuntu Documentation](https://help.ubuntu.com/)
 - [Fedora Documentation](https://docs.fedoraproject.org/)
 - [GitHub SSH Setup](https://docs.github.com/en/authentication/connecting-to-github-with-ssh)
 - [VS Code on Linux](https://code.visualstudio.com/docs/setup/linux)
+- [Docker on Linux](https://docs.docker.com/engine/install/)
+- [Rust Installation](https://www.rust-lang.org/tools/install)
+- [NVIDIA CUDA Toolkit](https://developer.nvidia.com/cuda-toolkit)
+- [AMD ROCm](https://rocm.docs.amd.com/)
+
+---
+
+**Having trouble?** Open an issue or check the [GETTING-STARTED-BEGINNER.md](GETTING-STARTED-BEGINNER.md) guide for more detailed instructions.
