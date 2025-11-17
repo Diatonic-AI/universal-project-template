@@ -44,7 +44,7 @@ jobs:
       # Only runs if package.json exists (auto-detection)
       - name: Setup Node.js
         if: ${{ hashFiles('**/package.json') != '' }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '20'
           # cache: 'npm'  # Uncomment to enable npm caching for faster builds
